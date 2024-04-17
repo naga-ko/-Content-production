@@ -18,6 +18,11 @@
     <script type="module">
         import * as THREE from "https://cdn.skypack.dev/three@0.132";
         import OrbitControls from "https://cdn.skypack.dev/threejs-orbit-controls";
+        import Stats from "https://cdn.skypack.dev/stats.js.fps";
+
+        const stats = new Stats();
+        stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+        document.body.appendChild(stats.dom);
 
         //シーンの追加
         const scene = new THREE.Scene();
@@ -42,10 +47,21 @@
         controls.dampingFactor = 0.2; //慣性力の設定
 
         //物体の追加
-        const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshStandardMaterial({});
+        const boxGeometry = new THREE.BoxGeometry(1, 1, 1, 16, 16, 16);
+        const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 16); //球体の追加
+        const planeGeometry = new THREE.PlaneGeometry(10, 10, 1); //平面の追加
+
+        const material = new THREE.MeshNormalMaterial({ wireframe: false });
         const box = new THREE.Mesh(boxGeometry, material);
-        scene.add(box);
+        const sphere = new THREE.Mesh(sphereGeometry, material); //メッシュ化
+        const plane = new THREE.Mesh(planeGeometry, material); //メッシュ化
+
+        sphere.position.set(1, 1, -2);
+        plane.position.set(0, -0.5, 0);
+
+        plane.rotation.x = Math.PI * -0.5
+
+        scene.add(box, sphere, plane); //シーンに追加
 
         //ライトの追加
         const light = new THREE.DirectionalLight(0xffffff);
@@ -54,7 +70,12 @@
 
         //アニメーション関数
         function animate() {
+
+            stats.begin(); //追加
+
             renderer.render(scene, camera);
+
+            stats.end(); //追加
 
             requestAnimationFrame(animate);
         }

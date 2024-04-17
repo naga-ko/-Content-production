@@ -19,6 +19,11 @@
         import * as THREE from "https://cdn.skypack.dev/three@0.132";
         import OrbitControls from "https://cdn.skypack.dev/threejs-orbit-controls";
         import Stats from "https://cdn.skypack.dev/stats.js.fps";
+        //モジュールの追加
+        import GUI from "https://cdn.jsdelivr.net/npm/lil-gui@0.19/+esm";
+
+        //GUIの追加
+        const gui = new GUI();
 
         const stats = new Stats();
         stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -50,18 +55,32 @@
         const boxGeometry = new THREE.BoxGeometry(1, 1, 1, 16, 16, 16);
         const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 16); //球体の追加
         const planeGeometry = new THREE.PlaneGeometry(10, 10, 1); //平面の追加
+        const torusGeometry = new THREE.TorusGeometry(0.4, 0.1, 16, 100, 5);
 
         const material = new THREE.MeshNormalMaterial({ wireframe: false });
         const box = new THREE.Mesh(boxGeometry, material);
         const sphere = new THREE.Mesh(sphereGeometry, material); //メッシュ化
         const plane = new THREE.Mesh(planeGeometry, material); //メッシュ化
+        const donuts = new THREE.Mesh(torusGeometry, material); //メッシュ化
 
-        sphere.position.set(1, 1, -2);
+        sphere.position.set(1.5, 0, 0);
         plane.position.set(0, -0.5, 0);
+        donuts.position.set(-1.5, 0, 0);
 
-        plane.rotation.x = Math.PI * -0.5
+        donuts.rotation.z = (Math.PI / 180) * 30; //直接角度を指定する場合（３０℃）
+        // donuts.rotation.z = Math.PI * 0.2;
+        plane.rotation.x = Math.PI * -0.5;
 
-        scene.add(box, sphere, plane); //シーンに追加
+        scene.add(box, sphere, plane, donuts); //シーンに追加
+
+        gui.add(box.position, "x", -3, 3, 0.1).name("transformX");
+        gui.add(box.position, "y", -3, 3, 0.1).name("transformY");
+        gui.add(box.position, "z", -3, 3, 0.1).name("transformZ");
+        gui.add(box.rotation, "x", 0, Math.PI * 2, Math.PI / 180).name("rotationX");
+        gui.add(box.rotation, "y", 0, Math.PI * 2, Math.PI / 180).name("rotationY");
+        gui.add(box.rotation, "z", 0, Math.PI * 2, Math.PI / 180).name("rotationZ");
+        gui.add(box, "visible");
+        gui.add(material, "wireframe");
 
         //ライトの追加
         const light = new THREE.DirectionalLight(0xffffff);
@@ -86,12 +105,34 @@
         //ウィンドウリサイズ時の処理
         function onWindowResize() {
             renderer.setSize(window.innerWidth, window.innerHeight);
-
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
         }
 
         window.addEventListener("resize", onWindowResize);
+
+
+
+        const count = 200; //変数追加
+        const bufferGeometry = new THREE.BufferGeometry();
+
+        //「三角形の座標9点 * count」分の配列を用意する
+        const vertices = new Float32Array(9 * count);
+
+        //for文でランダムな値を代入
+        for (let i = 0; i < 9 * count; i++) {
+            vertices[i] = Math.random() - 0.5;
+            console.log(vertices[i]);
+        }
+
+        bufferGeometry.setAttribute(
+            "position",
+            new THREE.BufferAttribute(vertices, 3)
+        );
+
+        const bufferMaterial = new THREE.MeshBasicMaterial({ wireframe: true });
+        const buffer = new THREE.Mesh(bufferGeometry, bufferMaterial);
+        // scene.add(buffer);
     </script>
 </body>
 

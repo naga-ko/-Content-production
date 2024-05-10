@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>パーティクル</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="module">
+        import * as THREE from "https://cdn.skypack.dev/three@0.132";
+        import OrbitControls from "https://cdn.skypack.dev/threejs-orbit-controls";
+        import Stats from "https://cdn.skypack.dev/stats.js.fps";
+        import GUI from "https://cdn.jsdelivr.net/npm/lil-gui@0.19/+esm";
+
+        //UIデバッグ
+        const gui = new GUI();
+
+        //FPSデバッグ
+        const stats = new Stats();
+        stats.showPanel(0);
+        document.body.appendChild(stats.dom);
+
+        //サイズ
+        const size = {
+            w: window.innerWidth,
+            h: window.innerHeight,
+        };
+
+        //シーン
+        const scene = new THREE.Scene();
+
+        //カメラ
+        const camera = new THREE.PerspectiveCamera(75, size.w / size.h, 0.1, 100);
+        camera.position.set(3, 2, 11);
+        scene.add(camera);
+
+        //ライト
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        //パーティクル
+        const particlesGeometry = new THREE.TorusKnotGeometry(10, 1, 100, 16);
+        // const material = new THREE.MeshStandardMaterial();
+        // const sphere = new THREE.Mesh(particlesGeometry, material);
+        // scene.add(sphere);
+
+        const texture = new THREE.TextureLoader().load("./textures/mizu.png");
+        const texture2 = new THREE.TextureLoader().load("./textures/mizu.png");
+
+        //パーティクル
+        const bufferGeometry = new THREE.BufferGeometry();
+        const count = 4000;
+        const vertices = new Float32Array(count * 3);
+        const colors = new Float32Array(count * 3);
+
+        for (let i = 0; i < 3 * count; i++) {
+            vertices[i] = (Math.random() - 0.5) * 10;
+            colors[i] = Math.random();
+        }
+        console.log(vertices);
+
+        bufferGeometry.setAttribute(
+            "position",
+            new THREE.BufferAttribute(vertices, 3)
+        );
+
+        bufferGeometry.setAttribute(
+            "color",
+            new THREE.BufferAttribute(colors, 3)
+        );
+
+        const pointMaterial = new THREE.PointsMaterial({
+            size: 0.6,
+            sizeAttenuation: true,
+            alphaMap: texture,
+            transparent: true,
+            depthWrite: false,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+        });
+
+        pointMaterial.map = texture; //テクスチャを貼る
+
+        const particles = new THREE.Points(bufferGeometry, pointMaterial);
+        scene.add(particles);
+
+        gui.add(pointMaterial, "size", 0.01, 1);
+
+        const bufferGeometry2 = new THREE.BufferGeometry();
+        const count2 = 1000;
+        const vertices2 = new Float32Array(count * 3);
+        const colors2 = new Float32Array(count * 3);
+
+        for (let i = 0; i < 3 * count; i++) {
+            vertices[i] = (Math.random() - 0.5) * 10;
+            colors[i] = Math.random();
+        }
+        console.log(vertices);
+
+        bufferGeometry2.setAttribute(
+            "position",
+            new THREE.BufferAttribute(vertices, 3)
+        );
+
+        bufferGeometry2.setAttribute(
+            "color",
+            new THREE.BufferAttribute(colors, 2)
+        );
+
+        const pointMaterial2 = new THREE.PointsMaterial({
+            size: 0.6,
+            sizeAttenuation: true,
+            alphaMap: texture,
+            transparent: true,
+            depthWrite: false,
+            vertexColors: true,
+            blending: THREE.SubtractiveBlending,
+            // blending: THREE.AdditiveBlending,
+        });
+
+        pointMaterial2.map = texture; //テクスチャを貼る
+
+        const particles2 = new THREE.Points(bufferGeometry2, pointMaterial2);
+        scene.add(particles2);
+
+        gui.add(pointMaterial2, "size", 0.01, 1);
+        //レンダラー
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(size.w, size.h);
+        document.body.appendChild(renderer.domElement);
+
+        //コントロール
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.1;
+
+        const clock = new THREE.Clock();
+
+        //アニメーション
+        const animate = () => {
+            stats.begin();
+            controls.update();
+            const elapsedTime = clock.getElapsedTime();
+
+            for (let i = 0; i < count; i++) {
+                const i3 = i * 3;
+                const x = bufferGeometry.attributes.position.array[i3]; //追加
+                bufferGeometry.attributes.position.array[i3 + 1] = Math.sin(elapsedTime + x); //変更
+            }
+
+            bufferGeometry.attributes.position.needsUpdate = true;
+
+            renderer.render(scene, camera);
+            stats.end();
+
+            requestAnimationFrame(animate);
+        };
+
+        animate();
+
+        const clock2 = new THREE.Clock();
+
+        const animate2 = () => {
+            stats.begin();
+            controls.update();
+            const elapsedTime2 = clock2.getElapsedTime();
+
+            for (let i = 0; i < count; i++) {
+                const i3 = i * 3;
+                const x = bufferGeometry2.attributes.position.array[i3]; //追加
+                bufferGeometry2.attributes.position.array[i3 + 1] = Math.sin(elapsedTime2 + x + 3); //変更
+            }
+
+            bufferGeometry2.attributes.position.needsUpdate = true;
+
+            renderer.render(scene, camera);
+            stats.end();
+
+            requestAnimationFrame(animate2);
+        };
+
+        animate2();
+
+        //リサイズ
+        const onWindowResize = () => {
+            size.w = window.innerWidth;
+            size.h = window.innerHeight;
+            renderer.setSize(size.w, size.h);
+
+            camera.aspect = size.w / size.h;
+            camera.updateProjectionMatrix();
+        };
+
+        window.addEventListener("resize", onWindowResize);
+    </script>
+</body>
+
+</html>

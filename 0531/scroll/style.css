@@ -16,7 +16,6 @@ body {
 @media (min-width: 1085px) {
   body {
     background-size: 1085px auto;
-    /* Fixed size for the background image */
   }
 }
 

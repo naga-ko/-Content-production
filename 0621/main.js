@@ -95,17 +95,17 @@ scene.add(group);
 
 // テクスチャの読み込み
 const mtlLoader = new MTLLoader();
-mtlLoader.load("models/juu/Colt Army Model 1860.mtl", (materials) => {
+mtlLoader.load("models/hito/OBJ/AnimatedHuman.mtl", (materials) => {
   materials.preload();
 
   // OBJデータの読み込み
   const objLoader = new OBJLoader();
   objLoader.setMaterials(materials); // 追加
-  objLoader.load("models/juu/Colt Army Model 1860.obj", (obj) => {
+  objLoader.load("models/hito/OBJ/AnimatedHuman.obj", (obj) => {
     group.add(obj);
 
     const scl = {
-      val: 13,
+      val: 1,
     };
     obj.scale.set(scl.val, scl.val, scl.val);
 
@@ -203,11 +203,11 @@ const animate = () => {
 
   if (key.up && group.position.z > -10) {
     group.position.z -= 0.1;
-    group.rotation.y = Math.PI;
+    group.rotation.y = 0;
   }
   if (key.down && group.position.z < 10) {
     group.position.z += 0.1;
-    group.rotation.y = 0;
+    group.rotation.y = Math.PI;
   }
   if (key.right && group.position.x < 10) {
     group.position.x += 0.1;

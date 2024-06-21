@@ -90,6 +90,7 @@ scene.add(group);
 const gltfLoader = new GLTFLoader();
 gltfLoader.load("models/hose/horse_statue_01_4k.gltf", (gltf) => {
   gltf.scene.scale.set(20, 20, 20);
+
   group.add(gltf.scene); // グループに追加
 });
 
@@ -203,19 +204,19 @@ const animate = () => {
 
   if (key.up && group.position.z > -10) {
     group.position.z -= 0.1;
-    group.rotation.y = 0;
+    group.rotation.y = Math.PI;
   }
   if (key.down && group.position.z < 10) {
     group.position.z += 0.1;
-    group.rotation.y = Math.PI;
+    group.rotation.y = 0;
   }
   if (key.right && group.position.x < 10) {
     group.position.x += 0.1;
-    group.rotation.y = -Math.PI / 2;
+    group.rotation.y = Math.PI / 2;
   }
   if (key.left && group.position.x > -10) {
     group.position.x -= 0.1;
-    group.rotation.y = Math.PI / 2;
+    group.rotation.y = -Math.PI / 2;
   }
 
   requestAnimationFrame(animate);

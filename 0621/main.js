@@ -74,13 +74,6 @@ scene.add(axesHelper);
 3Dモデル
 --------------------*/
 
-// GLTFデータの読み込み
-const gltfLoader = new GLTFLoader();
-gltfLoader.load("models/maru/grey_roof_tiles_4k.gltf", (gltf) => {
-  gltf.scene.scale.set(1, 1, 1);
-  // scene.add(gltf.scene);
-});
-
 // オブジェクトの追加
 const key = {
   up: false,
@@ -92,6 +85,13 @@ const key = {
 // グループの追加
 const group = new THREE.Group();
 scene.add(group);
+
+// GLTFデータの読み込み
+const gltfLoader = new GLTFLoader();
+gltfLoader.load("models/hose/horse_statue_01_4k.gltf", (gltf) => {
+  gltf.scene.scale.set(20, 20, 20);
+  group.add(gltf.scene); // グループに追加
+});
 
 // テクスチャの読み込み
 const mtlLoader = new MTLLoader();
